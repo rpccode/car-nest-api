@@ -15,7 +15,8 @@ export class ReservationService {
      private readonly configService: ConfigService
    ) {
      // Inicializar apiUrl en el constructor usando la variable de entorno
-     this.apiUrl = `${this.configService.get<string>('BACK_END')}/reservations`;
+     this.apiUrl = `${this.configService.get<string>('BACK_END')}/api/reservations`;
+     console.log(this.apiUrl);
    }
  
   
@@ -36,10 +37,19 @@ export class ReservationService {
   }
 
   // Método para verificar la disponibilidad de un vehículo
-  async checkCarAvailability(carId: string) {
-    const response = await lastValueFrom(
-      this.httpService.get(`${this.apiUrl}/availability/${carId}`)
-    );
-    return response.data;
+  async checkCarAvailability(carId: string, startDate: string, endDate: string) {
+    try {
+      const response = await lastValueFrom(
+        this.httpService.post(`${this.apiUrl}/check-availability`, {
+          vehicle_id: carId,
+          start_time: startDate,
+          end_time: endDate,
+        }),
+      );
+      return response.data;
+    } catch (error) {
+      // Manejo de errores
+      throw new Error(`Error al verificar la disponibilidad del vehículo: ${error.message}`);
+    }
   }
 }

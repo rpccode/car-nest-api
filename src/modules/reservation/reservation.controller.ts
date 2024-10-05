@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ReservationService } from './reservation.service';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
@@ -22,8 +22,12 @@ export class ReservationController {
   }
 
   // Endpoint para verificar disponibilidad
-  @Get('check-availability/:carId')
-  async checkCarAvailability(@Param('carId') carId: string) {
-    return this.reservationService.checkCarAvailability(carId);
+  @Get('check-availability')
+  async checkAvailability(
+    @Query('carId') carId: string,
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+  ) {
+    return await this.reservationService.checkCarAvailability(carId, startDate, endDate);
   }
 }
