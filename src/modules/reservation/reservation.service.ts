@@ -1,31 +1,37 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateReservationDto } from './dto/create-reservation.dto';
-import { UpdateReservationDto } from './dto/update-reservation.dto';
 import { lastValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ReservationService {
-   // Definir apiUrl como propiedad privada de la clase
-   private readonly apiUrl: string;
+  private readonly apiUrl: string;
 
-   constructor(
-     private readonly httpService: HttpService,
-     private readonly configService: ConfigService
-   ) {
-     // Inicializar apiUrl en el constructor usando la variable de entorno
-     this.apiUrl = `${this.configService.get<string>('BACK_END')}/api/reservations`;
-     console.log(this.apiUrl);
-   }
- 
-  
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService
+  ) {
+    this.apiUrl = `${this.configService.get<string>('BACK_END')}/api/reservations`;
+    console.log(this.apiUrl);
+  }
+
   // Método para obtener todas las reservas
   async getAllReservations() {
-    const response = await lastValueFrom(
-      this.httpService.get(`${this.apiUrl}/all`)
-    );
-    return response.data;
+    try {
+      const response = await lastValueFrom(
+        this.httpService.get(`${this.apiUrl}/all`)
+      );
+      return response.data;
+    } catch (error) {
+      const errorResponse = {
+        message: error.response?.data || 'Error desconocido',
+        status: error.status || 'Unknown',
+        statusText: error.response?.statusText || 'Unknown',
+        endpoint: error.config?.url || 'Unknown',
+      };
+      return    this.handleError(errorResponse);
+    }
   }
 
   // Método para crear una nueva reserva
@@ -48,8 +54,15 @@ export class ReservationService {
       );
       return response.data;
     } catch (error) {
-      // Manejo de errores
       throw new Error(`Error al verificar la disponibilidad del vehículo: ${error.message}`);
+    }
+  }
+
+  async handleError(error): Promise<void> {
+    if (error.status === 401) {
+      throw new UnauthorizedException(error);
+    } else {
+      throw new BadRequestException(error);
     }
   }
 }
