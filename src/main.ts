@@ -6,7 +6,8 @@ import { TokenInterceptor } from './interceptors/token.interceptor';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   // Usa el Guard globalmente para capturar el token
-  app.useGlobalGuards(new GlobalAuthGuard());
+  const globalAuthGuard = app.get(GlobalAuthGuard);
+  app.useGlobalGuards(globalAuthGuard);
 
   // Usa el Interceptor globalmente para agregar el token a las peticiones
   app.useGlobalInterceptors(new TokenInterceptor());
