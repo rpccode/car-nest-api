@@ -9,6 +9,7 @@ import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { GlobalAuthGuard } from './guards/globalAuth.Guard';
 
 @Module({
   imports: [
@@ -29,6 +30,6 @@ import { join } from 'path';
        HttpModule,
       ],
   controllers: [],
-  providers: [],
+  providers: [GlobalAuthGuard],
 })
 export class AppModule {}

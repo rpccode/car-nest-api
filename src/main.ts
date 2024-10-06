@@ -5,6 +5,12 @@ import { TokenInterceptor } from './interceptors/token.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.enableCors({
+    origin: '*', // Permitir solicitudes desde cualquier origen. Ajusta según tu necesidad.
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type, Accept, Authorization',
+  });
   // Usa el Guard globalmente para capturar el token
   const globalAuthGuard = app.get(GlobalAuthGuard);
   app.useGlobalGuards(globalAuthGuard);
