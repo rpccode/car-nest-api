@@ -19,7 +19,15 @@ export class TaskService {
     
     // Filtrar reservas que necesitan recordatorio
     const upcomingReservations = reservations.filter(
-      (reservation) => console.log('')
+       (reservation) => {
+    const now = new Date();
+    const reservationTime = new Date(reservation.startTime);
+    const timeDifference = reservationTime.getTime() - now.getTime();
+    const hoursUntilReservation = timeDifference / (1000 * 60 * 60);
+
+    // Recordatorio si faltan menos de 24 horas
+    return hoursUntilReservation <= 24 && hoursUntilReservation > 0;
+  }
     );
 
     // Enviar recordatorios

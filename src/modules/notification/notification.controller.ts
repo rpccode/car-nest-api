@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { NotificationService } from './notification.service';
-import { CreateNotificationDto } from './dto/create-notification.dto';
-import { UpdateNotificationDto } from './dto/update-notification.dto';
+import { SendNotificationDto } from './dto/create-notification.dto';
 
 @Controller('notification')
 export class NotificationController {
@@ -9,11 +8,8 @@ export class NotificationController {
 
   // Endpoint para enviar una notificación push
   @Post('send')
-  async sendNotification(
-    @Body('token') token: string,
-    @Body('title') title: string,
-    @Body('message') message: string,
-  ) {
+  async sendNotification(@Body() sendNotificationDto: SendNotificationDto) {
+    const { token, title, message } = sendNotificationDto;
     return this.notificationService.sendPushNotification(token, title, message);
   }
 }

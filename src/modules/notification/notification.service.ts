@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CreateNotificationDto } from './dto/create-notification.dto';
-import { UpdateNotificationDto } from './dto/update-notification.dto';
 import * as admin from 'firebase-admin';
 
 @Injectable()
@@ -29,6 +27,7 @@ export class NotificationService {
       await admin.messaging().sendToDevice(token, payload);
       return { success: true, message: 'Notification sent successfully' };
     } catch (error) {
+      console.error('Error sending notification:', error);
       return { success: false, message: 'Failed to send notification', error };
     }
   }
