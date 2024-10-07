@@ -20,7 +20,11 @@ export class ReservationService {
   async getAllReservations() {
     try {
       const response = await lastValueFrom(
-        this.httpService.get(`${this.apiUrl}/all`)
+        this.httpService.get(`${this.apiUrl}/all`,{
+          headers: {
+            Authorization: `Bearer ${this.configService.get<string>('API_KEY')}`,
+          },
+        })
       );
       return response.data;
     } catch (error) {
@@ -50,6 +54,10 @@ export class ReservationService {
           vehicle_id: carId,
           start_time: startDate,
           end_time: endDate,
+        },{
+          headers: {
+            Authorization: `Bearer ${this.configService.get<string>('API_KEY')}`,
+          },
         }),
       );
       return response.data;

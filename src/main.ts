@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { GlobalAuthGuard } from './guards/globalAuth.Guard';
 import { TokenInterceptor } from './interceptors/token.interceptor';
+import { HttpService } from '@nestjs/axios';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,8 +13,10 @@ async function bootstrap() {
     allowedHeaders: 'Content-Type, Accept, Authorization',
   });
   // Usa el Guard globalmente para capturar el token
-  const globalAuthGuard = app.get(GlobalAuthGuard);
-  app.useGlobalGuards(globalAuthGuard);
+  const httpService = app.get(HttpService);
+
+  // Usar el Guard globalmente
+  app.useGlobalGuards(new GlobalAuthGuard(httpService));
 
   // Usa el Interceptor globalmente para agregar el token a las peticiones
   app.useGlobalInterceptors(new TokenInterceptor());
