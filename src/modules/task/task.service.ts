@@ -53,7 +53,7 @@ export class TaskService {
           `Una o más reservas han expirado.`
         );
       }
-      console.log(expiredReservations.length === 0)
+      
       if(expiredReservations.length ===  0) {
         await this.pushTokenService.sendNotificationsToAll(
           'No hay Reserva Disponibles',
