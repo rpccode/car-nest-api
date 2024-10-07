@@ -62,15 +62,22 @@ export class ReservationService {
       );
       return response.data;
     } catch (error) {
-      throw new Error(`Error al verificar la disponibilidad del vehículo: ${error.message}`);
+      return this.handleError(error)
+      // throw new Error(`Error al verificar la disponibilidad del vehículo: ${error.message}`);
     }
   }
 
   async handleError(error): Promise<void> {
+    const errorResponse = {
+      message: error.response?.data || 'Error desconocido',
+      status: error.status || 'Unknown',
+      statusText: error.response?.statusText || 'Unknown',
+      endpoint: error.config?.url || 'Unknown',
+    };
     if (error.status === 401) {
-      throw new UnauthorizedException(error);
+      throw new UnauthorizedException(errorResponse);
     } else {
-      throw new BadRequestException(error);
+      throw new BadRequestException(errorResponse);
     }
   }
 }

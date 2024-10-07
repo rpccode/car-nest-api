@@ -24,9 +24,9 @@ export class ReservationController {
   // Endpoint para verificar disponibilidad
   @Get('check-availability')
   async checkAvailability(
-    @Query('carId') carId: string,
-    @Query('startDate') startDate: string,
-    @Query('endDate') endDate: string,
+    @Query('vehicle_id') carId: string,
+    @Query('start_time') startDate: string,
+    @Query('end_time') endDate: string,
   ) {
     return await this.reservationService.checkCarAvailability(carId, startDate, endDate);
   }

@@ -1,42 +1,58 @@
 import { Injectable } from '@nestjs/common';
-import { CreateTaskDto } from './dto/create-task.dto';
-import { UpdateTaskDto } from './dto/update-task.dto';
 import { ReservationService } from '../reservation/reservation.service';
-import { NotificationService } from '../notification/notification.service';
+ // Importa el servicio que maneja los tokens de notificaciones
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { NotificationService } from '../notification/notification.service';
+
 
 @Injectable()
 export class TaskService {
   constructor(
     private readonly reservationService: ReservationService,
-    private readonly notificationService: NotificationService,
+    private readonly pushTokenService: NotificationService, // Usar el servicio PushTokenService
   ) {}
 
-  // Tarea en paralelo para verificar reservas y enviar recordatorios
+  // Tarea en paralelo que se ejecuta cada hora
   @Cron(CronExpression.EVERY_HOUR)
   async handleReservationReminders() {
-    const reservations = await this.reservationService.getAllReservations();
-    
-    // Filtrar reservas que necesitan recordatorio
-    const upcomingReservations = reservations.filter(
-       (reservation) => {
-    const now = new Date();
-    const reservationTime = new Date(reservation.startTime);
-    const timeDifference = reservationTime.getTime() - now.getTime();
-    const hoursUntilReservation = timeDifference / (1000 * 60 * 60);
+    try {
+      // Obtén todas las reservas
+      const reservations = await this.reservationService.getAllReservations();
+      const now = new Date();
 
-    // Recordatorio si faltan menos de 24 horas
-    return hoursUntilReservation <= 24 && hoursUntilReservation > 0;
-  }
-    );
+      // Filtrar reservas próximas a vencer (dentro de 24 horas)
+      const upcomingReservations = reservations.filter((reservation) => {
+        const reservationTime = new Date(reservation.startTime);
+        const timeDifference = reservationTime.getTime() - now.getTime();
+        const hoursUntilReservation = timeDifference / (1000 * 60 * 60);
 
-    // Enviar recordatorios
-    for (const reservation of upcomingReservations) {
-      await this.notificationService.sendPushNotification(
-        reservation.userToken,
-        'Recordatorio de reserva',
-        'Su reserva de vehículo está próxima a iniciar.',
-      );
+        return hoursUntilReservation <= 24 && hoursUntilReservation > 0;
+      });
+
+      // Filtrar reservas que ya han vencido (pasado el tiempo de reserva)
+      const expiredReservations = reservations.filter((reservation) => {
+        const reservationTime = new Date(reservation.startTime);
+        return reservationTime.getTime() < now.getTime();
+      });
+
+      // Enviar notificaciones para reservas próximas a vencer
+      if (upcomingReservations.length > 0) {
+        await this.pushTokenService.sendNotificationsToAll(
+          'Recordatorio de reserva',
+          `Tiene una o más reservas próximas a iniciar.`
+        );
+      }
+
+      // Enviar notificaciones para reservas vencidas
+      if (expiredReservations.length > 0) {
+        await this.pushTokenService.sendNotificationsToAll(
+          'Reserva vencida',
+          `Una o más reservas han expirado.`
+        );
+      }
+
+    } catch (error) {
+      console.error('Error en el manejo de recordatorios de reserva:', error);
     }
   }
 }
