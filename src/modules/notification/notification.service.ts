@@ -48,6 +48,7 @@ export class NotificationService {
 
   // Método para enviar notificaciones a todos los tokens almacenados
   async sendNotificationsToAll(title: string, message: string): Promise<{ success: boolean; result: string[] }> {
+    console.log('enntro')
     const payload = {
       notification: {
         title,
@@ -58,14 +59,16 @@ export class NotificationService {
     const results = [];
 
     // Enviar la notificación a cada token almacenado
-    for (const token of this.tokens) {
+    
+    
       try {
-        await admin.messaging().sendToDevice(token, payload);
-        results.push(`Notification sent to ${token}`);
+        await admin.messaging().sendToDevice(this.tokens[0], payload);
+        results.push(`Notification sent to ${this.tokens[0]}`);
       } catch (error) {
-        results.push(`Failed to send notification to ${token}: ${error.message}`);
+        results.push(`Failed to send notification to ${this.tokens[0]}: ${error.message}`);
       }
-    }
+    
+      console.log(results)
 
     return { success: true, result: results };
   }
