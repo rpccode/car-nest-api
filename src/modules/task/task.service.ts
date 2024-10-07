@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ReservationService } from '../reservation/reservation.service';
  // Importa el servicio que maneja los tokens de notificaciones
 import { Cron, CronExpression } from '@nestjs/schedule';
@@ -7,16 +7,18 @@ import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class TaskService {
+  private readonly logger = new Logger(TaskService.name);
   constructor(
     private readonly reservationService: ReservationService,
     private readonly pushTokenService: NotificationService, // Usar el servicio PushTokenService
   ) {}
 
   // Tarea en paralelo que se ejecuta cada hora
-  @Cron(CronExpression.EVERY_HOUR)
+  @Cron(CronExpression.EVERY_10_SECONDS)
   async handleReservationReminders() {
     try {
       // Obtén todas las reservas
+      this.logger.debug('Ejecutando handleReservationReminders');
       const reservations = await this.reservationService.getAllReservations();
       const now = new Date();
 
@@ -52,7 +54,7 @@ export class TaskService {
       }
 
     } catch (error) {
-      console.error('Error en el manejo de recordatorios de reserva:', error);
+      this.logger.error('Error en el manejo de recordatorios de reserva:', error);
     }
   }
 }
