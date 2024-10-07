@@ -37,6 +37,7 @@ export class TaskService {
         return reservationTime.getTime() < now.getTime();
       });
 
+
       // Enviar notificaciones para reservas próximas a vencer
       if (upcomingReservations.length > 0) {
         await this.pushTokenService.sendNotificationsToAll(
@@ -52,6 +53,15 @@ export class TaskService {
           `Una o más reservas han expirado.`
         );
       }
+      console.log(expiredReservations.length === 0)
+      if(expiredReservations.length ===  0) {
+        await this.pushTokenService.sendNotificationsToAll(
+          'No hay Reserva Disponibles',
+          `No hay más reservas disponibles.`
+          ); 
+       this.logger.warn(' expiredReservations  ')   
+      }
+      this.logger.debug('Finalizó handleReservationReminders');
 
     } catch (error) {
       this.logger.error('Error en el manejo de recordatorios de reserva:', error);
