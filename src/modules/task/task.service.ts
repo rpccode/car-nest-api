@@ -14,7 +14,7 @@ export class TaskService {
   ) {}
 
   // Tarea en paralelo que se ejecuta cada hora
-  @Cron(CronExpression.EVERY_HOUR)
+  @Cron(CronExpression.EVERY_10_SECONDS)
   async handleReservationReminders() {
     try {
       // Obtén todas las reservas
