@@ -8,21 +8,21 @@ export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
   // Endpoint para enviar una notificación push
-  @Post('send')
-  async sendNotification(@Body() sendNotificationDto: SendNotificationDto) {
-    const { token, title, message } = sendNotificationDto;
-    return this.notificationService.sendPushNotification(token, title, message);
-  }
+  // @Post('send')
+  // async sendNotification(@Body() sendNotificationDto: SendNotificationDto) {
+  //   const { token, title, message } = sendNotificationDto;
+  //   return this.notificationService.sendPushNotification(token, title, message);
+  // }
   @Post('save-token')
   async savePushToken(@Body() createPushTokenDto: CreatePushTokenDto) {
     return this.notificationService.saveToken(createPushTokenDto.token);
   }
 
   // Obtener todos los tokens guardados
-  @Get('get-tokens')
-  async getTokens() {
-    return this.notificationService.getTokens();
-  }
+  // @Get('get-tokens')
+  // async getTokens() {
+  //   return this.notificationService.getTokens();
+  // }
 
   // Enviar notificación a todos los tokens almacenados
   @Post('send-notifications')
