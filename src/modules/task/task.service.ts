@@ -12,6 +12,7 @@ export class TaskService {
     private readonly reservationService: ReservationService,
     private readonly pushTokenService: NotificationService, // Usar el servicio PushTokenService
   ) {}
+  //probando 4
 
   // Tarea en paralelo que se ejecuta cada hora
   @Cron(CronExpression.EVERY_HOUR)
